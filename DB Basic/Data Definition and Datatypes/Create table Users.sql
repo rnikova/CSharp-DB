@@ -5,6 +5,7 @@ CREATE TABLE Users(
 	Id BIGINT PRIMARY KEY IDENTITY,
 	Username VARCHAR(30) NOT NULL,
 	Password VARCHAR(26) NOT NULL,
+	CHECK (DATALENGTH(Password) >= 5),
 	ProfilePicture VARBINARY(MAX),
 	CHECK (DATALENGTH(ProfilePicture) <= 921600),
 	LastLoginTime DATETIME2,
@@ -17,3 +18,14 @@ INSERT INTO Users(Username, Password, ProfilePicture, LastLoginTime, IsDeleted) 
 ('Gosho','123', NULL, NULL, 0),
 ('Stamat','1234', NULL, NULL, 1),
 ('Iva', '123', NULL, NULL, 0)
+
+ALTER TABLE Users
+DROP CONSTRAINT PK__Users__3214EC0732162451
+
+ALTER TABLE Users
+ADD CONSTRAINT PK_CompositeIdUsername
+PRIMARY KEY (Id, Username)
+
+ALTER TABLE Users
+ADD CONSTRAINT DF_LastLoginTime
+DEFAULT GETDATE() FOR LastLoginTime
