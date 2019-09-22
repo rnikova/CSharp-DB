@@ -109,3 +109,10 @@ INSERT INTO Occupancies(EmployeeId, AccountNumber, RoomNumber) VALUES
 (1, 1, 2),
 (2, 2, 2),
 (3, 3, 3)
+
+UPDATE Payments
+SET TaxRate *= 0.97
+
+SELECT TaxRate FROM Payments
+
+TRUNCATE TABLE Occupancies
