@@ -4839,3 +4839,30 @@ ON ep.EmployeeID = e.EmployeeID
 JOIN Projects p 
 ON p.ProjectID = ep.ProjectID
 WHERE e.EmployeeID = 24
+
+SELECT e.EmployeeID, e.FirstName, e.ManagerID, m.FirstName AS [ManagerName]
+FROM Employees e
+JOIN Employees m 
+ON m.EmployeeID = e.ManagerID
+WHERE m.EmployeeID IN (3, 7)
+ORDER BY e.EmployeeID
+
+SELECT TOP(50) 
+	e.EmployeeID, 
+	e.FirstName + ' ' + E.LastName AS [EmployeeName], 
+	m.FirstName + ' ' + m.LastName AS [ManagerName], 
+	d.[Name]
+FROM Employees e
+JOIN Employees m 
+ON m.EmployeeID = e.ManagerID
+JOIN Departments d
+ON d.DepartmentID = e.DepartmentID
+ORDER BY e.EmployeeID
+
+SELECT MIN(a.AverageSalary) AS [MinAverageSalary]
+FROM
+(
+	SELECT e.DepartmentID, AVG(e.Salary) AS [AverageSalary]
+	FROM Employees e
+	GROUP BY e.DepartmentID
+) AS a
