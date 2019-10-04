@@ -51,3 +51,48 @@ INSERT INTO Accounts (Id, AccountHolderId, Balance) VALUES (15, 6, 0.19);
 INSERT INTO Accounts (Id, AccountHolderId, Balance) VALUES (16, 2, 5345.34);
 INSERT INTO Accounts (Id, AccountHolderId, Balance) VALUES (17, 11, 76653.20);
 INSERT INTO Accounts (Id, AccountHolderId, Balance) VALUES (18, 1, 235469.89);
+
+GO
+
+CREATE OR ALTER PROCEDURE usp_GetHoldersFullName 
+AS
+	SELECT a.FirstName + ' ' + a.LastName AS [Full Name]
+	FROM AccountHolders a
+
+GO
+
+CREATE OR ALTER PROCEDURE usp_GetHoldersWithBalanceHigherThan(@amount DECIMAL(15, 2))
+AS
+	SELECT ah.FirstName, ah.LastName
+	FROM AccountHolders ah
+	JOIN Accounts a
+	ON a.AccountHolderId = ah.Id
+	GROUP BY ah.FirstName, ah.LastName
+	HAVING SUM(a.Balance) > @amount
+	ORDER BY ah.FirstName, ah.LastName
+
+EXEC [dbo].usp_GetHoldersWithBalanceHigherThan 7000
+
+GO
+CREATE FUNCTION ufn_CalculateFutureValue(@sum DECIMAL(15, 2), @rate FLOAT, @years INT)
+RETURNS DECIMAL(15, 4)
+AS
+BEGIN
+	RETURN @sum * (POWER(1 + @rate, @years))
+END
+
+GO
+
+CREATE PROCEDURE usp_CalculateFutureValueForAccount(@accountId INT, @rate FLOAT)
+AS
+BEGIN
+	SELECT a.Id AS [Account Id],
+	       ah.FirstName AS [First Name],
+		   ah.LastName AS [Last Name],
+		   a.Balance AS [Current Balance],
+		   dbo.ufn_CalculateFutureValue(a.Balance, @rate, 5) AS [Balance in 5 years]
+	FROM Accounts a
+	JOIN AccountHolders ah 
+	ON a.AccountHolderId = ah.Id
+	WHERE a.Id = @accountId
+END
