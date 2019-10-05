@@ -96,3 +96,70 @@ BEGIN
 	ON a.AccountHolderId = ah.Id
 	WHERE a.Id = @accountId
 END
+
+
+CREATE TABLE Logs
+(
+	LogId INT PRIMARY KEY IDENTITY,
+	AccountId INT,
+	OldSum DECIMAL(15, 2),
+	NewSum DECIMAL(15, 2)
+)
+
+CREATE TRIGGER tr_UpdateBalance ON Accounts FOR UPDATE
+AS
+BEGIN
+	DECLARE @newSum DECIMAL(15, 2) = (SELECT i.Balance FROM INSERTED AS i)
+	DECLARE @oldSum DECIMAL(15, 2) = (SELECT d.Balance FROM DELETED AS d)
+	DECLARE @accountId INT = (SELECT i.Id FROM INSERTED AS i)
+
+	INSERT INTO Logs
+	(
+	    AccountId,
+	    OldSum,
+	    NewSum
+	)
+	VALUES
+	(
+		@accountId,
+		@oldSum,
+		@newSum
+	)
+END
+
+CREATE TABLE NotificationEmails
+(
+	Id INT PRIMARY KEY IDENTITY NOT NULL,
+	Recipient INT,
+	[Subject] VARCHAR(500),
+	Body VARCHAR(500)
+)
+
+CREATE TRIGGER tr_AddNewEmail ON Logs FOR INSERT
+AS
+BEGIN
+	DECLARE @recipient INT = 
+		(
+			SELECT i.AccountId
+			FROM inserted i
+		)
+	DECLARE @oldSum DECIMAL(15, 2) = 
+		(
+			SELECT i.OldSum
+			FROM inserted i
+		)
+	DECLARE @newSum DECIMAL(15, 2) = 
+		(
+			SELECT i.NewSum
+			FROM inserted i
+		)
+
+	INSERT INTO NotificationEmails(Recipient, [Subject], Body) VALUES
+	(	
+		@recipient,
+		'Balance change for account: ' + CAST(@recipient AS VARCHAR(15)),
+	    'On ' + CAST(GETDATE() AS VARCHAR(50)) + ' your balance was changed from ' +
+	    CAST(@oldSum AS VARCHAR(30)) + ' to ' +
+	    CAST(@newSum AS VARCHAR(50)) + '.'
+	)
+END

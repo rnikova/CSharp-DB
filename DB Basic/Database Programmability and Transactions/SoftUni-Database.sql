@@ -4804,6 +4804,7 @@ AS
 
 EXEC [dbo].usp_GetEmployeesSalaryAbove35000
 
+GO
 
 CREATE PROCEDURE usp_GetEmployeesSalaryAboveNumber (@number DECIMAL(18, 4) = 48100)
 AS
@@ -4813,6 +4814,7 @@ AS
 
 EXEC [dbo].usp_GetEmployeesSalaryAboveNumber
 
+GO
 
 CREATE OR ALTER PROCEDURE usp_GetTownsStartingWith(@letter NVARCHAR(20))
 AS
@@ -4821,6 +4823,8 @@ AS
 	WHERE t.[Name] LIKE @letter + '%'
 
 EXEC [dbo].usp_GetTownsStartingWith sa
+
+GO
 
 CREATE OR ALTER PROCEDURE usp_GetEmployeesFromTown(@townName NVARCHAR(50))
 AS
@@ -4833,6 +4837,9 @@ AS
 	WHERE t.[Name] = @townName
 
 EXEC [dbo].usp_GetEmployeesFromTown Sofia
+
+
+GO
 
 CREATE OR ALTER FUNCTION ufn_GetSalaryLevel(@salary DECIMAL(18,4))
 RETURNS NVARCHAR(20)
@@ -4848,12 +4855,40 @@ BEGIN
 	RETURN @level
 END
 
+GO
+
 CREATE OR ALTER PROCEDURE usp_EmployeesBySalaryLevel(@salaryLevel NVARCHAR(20))
 AS
 	SELECT e.FirstName, e.LastName
 	FROM Employees e
 	WHERE [dbo].ufn_GetSalaryLevel(e.Salary) = @salaryLevel
 
+GO
 
+CREATE OR ALTER FUNCTION ufn_IsWordComprised(@setOfLetters NVARCHAR(50), @word NVARCHAR(50))
+RETURNS BIT
+AS
+BEGIN
+	DECLARE @result BIT
+	DECLARE @count INT = 1
 
+	WHILE @count <= LEN(@Word)
+	BEGIN
+		DECLARE @currentSymbol VARCHAR(2) = SUBSTRING(@Word, @count, 1)
+
+		IF(CHARINDEX(@currentSymbol, @SetOfLetters)) > 0
+			BEGIN
+				SET @result = 1
+				SET @count+=1
+			END
+		ELSE
+			BEGIN
+				SET @result = 0
+				BREAK
+			END
+	END
+	RETURN @result
+END
+
+GO
 
