@@ -106,6 +106,8 @@ CREATE TABLE Logs
 	NewSum DECIMAL(15, 2)
 )
 
+GO
+
 CREATE TRIGGER tr_UpdateBalance ON Accounts FOR UPDATE
 AS
 BEGIN
@@ -135,6 +137,8 @@ CREATE TABLE NotificationEmails
 	Body VARCHAR(500)
 )
 
+GO
+
 CREATE TRIGGER tr_AddNewEmail ON Logs FOR INSERT
 AS
 BEGIN
@@ -162,4 +166,42 @@ BEGIN
 	    CAST(@oldSum AS VARCHAR(30)) + ' to ' +
 	    CAST(@newSum AS VARCHAR(50)) + '.'
 	)
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE usp_DepositMoney(@accountId INT, @moneyAmount DECIMAL(15, 4))
+AS
+BEGIN
+	IF(@moneyAmount > 0)
+	BEGIN
+		UPDATE Accounts
+		SET Balance += @moneyAmount
+		WHERE Accounts.Id = @accountId
+	END
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE usp_WithdrawMoney (@accountId INT, @moneyAmount DECIMAL(15, 4))
+AS
+BEGIN
+	IF(@moneyAmount > 0)
+	BEGIN
+		UPDATE Accounts
+		SET Balance -= @moneyAmount
+		WHERE Accounts.Id = @accountId
+	END
+END
+
+GO
+
+CREATE OR ALTER PROCEDURE usp_TransferMoney(@senderId INT, @receiverId INT, @amount DECIMAL(15, 4))
+AS
+BEGIN
+	IF(@amount > 0)
+	BEGIN
+		EXEC [dbo].usp_DepositMoney @receiverId, @amount
+		EXEC [dbo].usp_WithdrawMoney @senderId, @amount
+	END
 END
