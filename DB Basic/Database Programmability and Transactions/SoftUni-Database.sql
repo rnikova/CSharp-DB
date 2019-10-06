@@ -4892,3 +4892,23 @@ END
 
 GO
 
+CREATE TABLE Deleted_Employees
+(EmployeeId INT PRIMARY KEY, 
+ FirstName NVARCHAR(50), 
+ LastName NVARCHAR(50), 
+ MiddleName NVARCHAR(50), 
+ JobTitle NVARCHAR(50), 
+ DepartmentId INT, 
+ Salary DECIMAL (15, 2)
+);
+
+GO
+
+CREATE TRIGGER tr_FiredEmployees
+ON Employees
+INSTEAD OF DELETE
+AS
+	INSERT INTO Deleted_Employees
+	SELECT EmployeeId, FirstName, LastName, MiddleName, JobTitle, DepartmentID, Salary
+	FROM deleted
+
