@@ -4906,9 +4906,33 @@ GO
 
 CREATE TRIGGER tr_FiredEmployees
 ON Employees
-INSTEAD OF DELETE
+AFTER DELETE
 AS
+BEGIN
 	INSERT INTO Deleted_Employees
-	SELECT EmployeeId, FirstName, LastName, MiddleName, JobTitle, DepartmentID, Salary
+	SELECT FirstName, LastName, MiddleName, JobTitle, DepartmentID, Salary
 	FROM deleted
+END
 
+GO
+
+CREATE OR ALTER PROCEDURE udp_AssignProject(@EmployeeID INT, @ProjectID INT)
+AS
+BEGIN
+	DECLARE @maxEmployeeProjectsCount INT = 3
+	DECLARE @employeeProjectsCount INT
+
+	SET @employeeProjectsCount =
+
+		(SELECT COUNT(*)
+		FROM [dbo].[EmployeesProjects] AS ep
+		WHERE ep.EmployeeId = @EmployeeID)
+
+		IF(@employeeProjectsCount >= @maxEmployeeProjectsCount)
+		BEGIN
+			THROW 50001, 'The employee has too many projects!', 1;
+		END
+
+	INSERT INTO [dbo].[EmployeesProjects](EmployeeID, ProjectID)
+	VALUES (@EmployeeID, @ProjectID)
+END
