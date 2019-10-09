@@ -145,3 +145,20 @@ VALUES
 (40, 7, 1, '11/05/2015', NULL, 'Lonely child on corner of Str.1 and Str.19', 7, 25);
 
 SET IDENTITY_INSERT Reports OFF;
+
+
+SELECT u.Username, u.Age
+FROM Users u
+ORDER BY u.Age, u.Username DESC
+
+SELECT r.[Description], r.OpenDate
+FROM Reports r
+WHERE r.EmployeeId IS NULL
+ORDER BY r.OpenDate, r.[Description]
+
+SELECT e.FirstName, e.LastName, r.[Description], FORMAT(R.Opendate, 'yyyy-MM-dd') AS [OpenDate]
+FROM Employees e
+JOIN Reports r
+ON r.EmployeeId = e.Id
+ORDER BY e.Id, [OpenDate], r.Id
+
