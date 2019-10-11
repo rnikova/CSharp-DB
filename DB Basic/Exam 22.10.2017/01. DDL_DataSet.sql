@@ -207,3 +207,30 @@ ON u.Id = r.UserId
 WHERE DAY(r.OpenDate) = DAY(u.BirthDate)
 AND MONTH(r.OpenDate) = MONTH(u.BirthDate)
 ORDER BY c.[Name]
+
+SELECT DISTINCT u.Username
+FROM Users u
+JOIN Reports r
+ON r.UserId = u.Id
+JOIN Categories c
+ON c.Id = r.CategoryId
+WHERE (u.Username LIKE '[0-9]_%' AND CAST(c.Id AS VARCHAR) = LEFT(u.Username, 1))
+OR
+(u.Username LIKE '%_[0-9]' AND CAST(c.Id AS VARCHAR) = RIGHT(u.Username, 1))
+ORDER BY u.Username
+
+SELECT e.FirstName + ' ' + e.LastName AS [Name],
+	   ISNULL(CONVERT(varchar, cc.ReportSum), '0') + '/' +        
+       ISNULL(CONVERT(varchar, oc.ReportSum), '0') AS [Closed Open Reports]
+FROM Employees e
+JOIN (SELECT r.EmployeeId, COUNT(1) AS ReportSum
+	  FROM Reports r
+	  WHERE YEAR(r.OpenDate) = 2016
+	  GROUP BY r.EmployeeId) AS oc
+ON oc.EmployeeId = e.Id
+LEFT JOIN (SELECT EmployeeId,  COUNT(1) AS ReportSum
+	       FROM Reports R
+	       WHERE  YEAR(CloseDate) = 2016
+	       GROUP BY EmployeeId) AS cc
+ON cc.EmployeeId = e.Id
+ORDER BY e.FirstName + ' ' + e.LastName
