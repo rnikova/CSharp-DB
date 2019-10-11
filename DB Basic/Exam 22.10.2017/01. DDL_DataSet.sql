@@ -162,3 +162,48 @@ JOIN Reports r
 ON r.EmployeeId = e.Id
 ORDER BY e.Id, [OpenDate], r.Id
 
+SELECT c.[Name] AS [CategoryName], COUNT(r.CategoryId) AS [ReportsNumber]
+FROM Categories c
+JOIN Reports r
+ON r.CategoryId = c.Id
+GROUP BY r.CategoryId, c.[Name]
+ORDER BY COUNT(r.CategoryId) DESC, c.[Name]
+
+SELECT c.[Name] AS [CategoryName], COUNT(e.Id)
+FROM Categories c
+JOIN Departments d
+ON d.Id = c.DepartmentId
+JOIN Employees e
+ON e.DepartmentId = c.DepartmentId
+GROUP BY c.[Name]
+
+SELECT e.FirstName + ' ' + e.LastName AS [Name], COUNT(DISTINCT r.UserId) AS [Users Number]
+FROM Employees e
+LEFT JOIN Reports r
+ON r.EmployeeId = e.Id
+GROUP BY e.FirstName + ' ' + e.LastName
+ORDER BY [Users Number] DESC, e.FirstName + ' ' + e.LastName
+
+SELECT r.OpenDate, r.[Description], u.Email
+FROM Reports r
+JOIN Users u
+ON u.Id = r.UserId
+JOIN Categories c
+ON c.Id = r.CategoryId
+JOIN Departments d
+ON d.Id = c.DepartmentId
+WHERE r.CloseDate IS NULL
+AND r.[Description] LIKE '%str%'
+AND LEN(r.[Description]) > 20
+AND d.Id IN (1, 4, 5)
+ORDER BY r.OpenDate, u.Email, r.Id
+
+SELECT DISTINCT c.[Name]
+FROM Categories c
+JOIN Reports r
+ON r.CategoryId = c.Id
+JOIN Users u
+ON u.Id = r.UserId
+WHERE DAY(r.OpenDate) = DAY(u.BirthDate)
+AND MONTH(r.OpenDate) = MONTH(u.BirthDate)
+ORDER BY c.[Name]
