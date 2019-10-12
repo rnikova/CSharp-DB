@@ -234,3 +234,62 @@ LEFT JOIN (SELECT EmployeeId,  COUNT(1) AS ReportSum
 	       GROUP BY EmployeeId) AS cc
 ON cc.EmployeeId = e.Id
 ORDER BY e.FirstName + ' ' + e.LastName
+
+SELECT d.[Name],
+	   ISNULL(CONVERT(VARCHAR, AVG(DATEDIFF(DAY, r.OpenDate, r.CloseDate))), 'no info') AS [Average Duration]
+FROM Departments d
+JOIN Categories c
+ON c.DepartmentId = d.Id
+LEFT JOIN Reports r
+ON r.CategoryId = c.Id
+GROUP BY d.[Name]
+ORDER BY d.[Name]
+
+
+GO
+
+CREATE OR ALTER FUNCTION udf_GetReportsCount(@employeeId INT, @statusId INT)
+RETURNS INT
+BEGIN
+	DECLARE @count INT = (SELECT COUNT(*)
+						  FROM Reports r
+						  WHERE r.EmployeeId = @employeeId
+						  AND r.StatusId = @statusId)
+
+	RETURN @count
+END
+
+SELECT Id, FirstName, Lastname, dbo.udf_GetReportsCount(Id, 2) AS ReportsCount
+FROM Employees
+ORDER BY Id
+
+GO
+
+CREATE OR ALTER PROCEDURE usp_AssignEmployeeToReport(@employeeId INT, @reportId INT)
+AS
+BEGIN
+	BEGIN TRAN
+	DECLARE @categoryId INT = (SELECT r.CategoryId
+							   FROM Reports r
+						       WHERE r.CategoryId = @reportId)
+
+	DECLARE @employeeDeptId INT = (SELECT e.DepartmentId
+								   FROM Employees e
+								   WHERE e.Id = @employeeId)
+
+	DECLARE @reportDeptID INT = (SELECT c.DepartmentId
+								 FROM Categories c
+								 WHERE c.Id = @categoryId)
+
+	UPDATE Reports
+	SET EmployeeId = @employeeId
+	WHERE Id = @reportId
+
+	IF @employeeId IS NOT NULL AND @employeeDeptId <> @reportDeptID
+	BEGIN
+		ROLLBACK;
+		THROW 50013, 'Employee doesn''t belong to the appropriate department!', 1
+	END
+	COMMIT
+END
+
