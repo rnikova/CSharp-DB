@@ -101,3 +101,48 @@ LEFT JOIN Hotels h
 ON h.CityId = c.Id
 GROUP BY c.[Name]
 ORDER BY [Hotels] DESC, c.[Name]
+
+SELECT r.Id, r.Price, h.[Name], c.[Name]
+FROM Rooms r
+JOIN Hotels h
+ON h.Id = r.HotelId
+JOIN Cities c
+ON c.Id = h.CityId
+WHERE r.[Type] = 'First Class'
+ORDER BY r.Price DESC, r.Id
+
+SELECT at.AccountId, 
+	CONCAT(a.FirstName, ' ', a.LastName) AS [FullName],
+	MAX(DATEDIFF(DAY, t.ArrivalDate, t.ReturnDate)) AS [LongestTrip],
+	MIN(DATEDIFF(DAY, t.ArrivalDate, t.ReturnDate)) AS [ShortestTrip]
+FROM AccountsTrips at
+JOIN Accounts a
+ON a.Id = at.AccountId
+JOIN Trips t
+ON t.Id = at.TripId
+WHERE a.MiddleName IS NULL AND t.CancelDate IS NULL
+GROUP BY at.AccountId, CONCAT(a.FirstName, ' ', a.LastName), a.Id
+ORDER BY [LongestTrip] DESC, a.Id
+
+SELECT TOP(5) c.Id, c.[Name], c.CountryCode AS [Country], COUNT(a.Id) AS [Accounts]
+FROM Accounts a
+JOIN Cities c
+ON c.Id = a.CityId
+GROUP BY c.Id, c.[Name], c.CountryCode
+ORDER BY [Accounts] DESC
+
+SELECT a.Id, a.Email, c.[Name] AS [City], COUNT(*) AS [Trips]
+FROM Accounts a
+JOIN AccountsTrips at 
+ON a.Id = at.AccountId
+JOIN Trips t 
+ON at.TripId = t.Id
+JOIN Rooms r 
+ON t.RoomId = r.Id
+JOIN Hotels h 
+ON r.HotelId = h.Id
+JOIN Cities c 
+ON h.CityId = c.Id
+WHERE a.CityId = h.CityId
+GROUP BY a.Id, a.Email, a.CityId, c.[Name]
+ORDER BY Trips DESC, a.Id
