@@ -146,3 +146,88 @@ ON h.CityId = c.Id
 WHERE a.CityId = h.CityId
 GROUP BY a.Id, a.Email, a.CityId, c.[Name]
 ORDER BY Trips DESC, a.Id
+
+SELECT TOP(10) c.Id, c.[Name], SUM(h.BaseRate + r.Price) AS [Total Revenue], COUNT(*)  AS [Trips]
+FROM Hotels h
+JOIN Rooms r
+ON r.HotelId = h.Id
+JOIN Cities c
+ON c.Id = h.CityId
+JOIN Trips t
+ON t.RoomId = r.Id
+WHERE YEAR(t.BookDate) = 2016
+GROUP BY c.Id, c.[Name]
+ORDER BY [Total Revenue] DESC, [Trips] DESC
+
+
+SELECT at.TripId, 
+	   h.[Name] AS [HotelName], 
+	   r.[Type] AS [RoomType], 
+	   CASE WHEN t.CancelDate IS NULL THEN SUM(h.BaseRate + r.Price)
+	   ELSE 0 END AS [Revenue]
+FROM Hotels h
+JOIN Rooms r
+ON r.HotelId = h.Id
+JOIN Trips t
+ON t.RoomId = r.Id
+JOIN AccountsTrips at
+ON at.TripId = t.Id
+GROUP BY at.TripId, h.[Name], r.[Type], t.CancelDate
+ORDER BY r.[Type], at.TripId
+
+
+SELECT AccountId, Email, CountryCode, Trips
+FROM (SELECT
+        a.Id AS AccountId,
+        a.Email,
+        c.CountryCode,
+        COUNT(*) AS Trips,
+        DENSE_RANK() OVER (PARTITION BY c.CountryCode ORDER BY COUNT(*) DESC, a.Id ) AS Rank
+      FROM Accounts A
+        JOIN AccountsTrips at 
+		ON a.Id = at.AccountId
+        JOIN Trips t 
+		ON at.TripId = t.Id
+        JOIN Rooms r 
+		ON t.RoomId = r.Id
+        JOIN Hotels h 
+		ON r.HotelId = h.Id
+        JOIN Cities c 
+		ON h.CityId = c.Id
+        GROUP BY c.CountryCode, a.Email, a.Id) AS RanksPerCountry
+WHERE Rank = 1
+ORDER BY Trips DESC, AccountId
+
+
+SELECT TripId, 
+	   SUM(Luggage) AS Luggage, 
+	   '$' + CONVERT(VARCHAR(10), SUM(Luggage) * CASE WHEN SUM(Luggage) > 5 THEN 5 ELSE 0 END) AS Fee
+FROM Trips
+JOIN AccountsTrips AT on Trips.Id = AT.TripId
+GROUP BY TripId
+HAVING SUM(Luggage) > 0
+ORDER BY Luggage DESC
+
+
+SELECT
+  t.Id,
+  CONCAT(a.FirstName, ' ' + a.MiddleName, ' ', a.LastName) AS [Full Name],
+  ac.Name AS [From],
+  hc.Name AS [To],
+  CASE WHEN CancelDate IS NOT NULL THEN 'Canceled'
+  ELSE CONCAT(DATEDIFF(DAY, T.ArrivalDate, T.ReturnDate), ' days')
+  END  AS Duration
+FROM Trips AS t
+JOIN AccountsTrips at 
+ON t.Id = at.TripId
+JOIN Accounts a 
+ON at.AccountId = a.Id
+JOIN Rooms r 
+ON t.RoomId = r.Id
+JOIN Hotels h 
+ON r.HotelId = h.Id
+JOIN Cities hc 
+ON h.CityId = hc.Id
+JOIN Cities ac 
+ON a.CityId = ac.Id
+ORDER BY [Full Name], T.Id
