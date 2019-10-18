@@ -231,3 +231,95 @@ ON h.CityId = hc.Id
 JOIN Cities ac 
 ON a.CityId = ac.Id
 ORDER BY [Full Name], T.Id
+
+SELECT * FROM Rooms
+GO
+CREATE OR ALTER FUNCTION udf_GetAvailableRoom(@HotelId INT, @Date DATE, @People INT)
+RETURNS NVARCHAR(MAX)
+BEGIN
+	DECLARE @BookedRooms TABLE(Id INT)
+
+    INSERT INTO @BookedRooms
+      SELECT DISTINCT R.Id
+      FROM Rooms R
+        LEFT JOIN Trips T on R.Id = T.RoomId
+      WHERE R.HotelId = @HotelId AND @Date BETWEEN T.ArrivalDate AND T.ReturnDate AND T.CancelDate IS NULL
+
+    DECLARE @Rooms TABLE(Id INT, Price DECIMAL(15, 2), [Type] NVARCHAR(20), Beds INT, TotalPrice DECIMAL(15, 2))
+    INSERT INTO @Rooms
+      SELECT TOP (1)
+        r.Id,
+        r.Price,
+        r.[Type],
+        r.Beds,
+        @People * (h.BaseRate + r.Price) AS TotalPrice
+      FROM Rooms r
+        LEFT JOIN Hotels h ON r.HotelId = h.Id
+      WHERE
+        r.HotelId = @HotelId AND
+        r.Beds >= @People AND
+        r.Id NOT IN (SELECT Id
+                     FROM @BookedRooms)
+      ORDER BY TotalPrice DESC
+
+    DECLARE @RoomCount INT = (SELECT COUNT(*) FROM @Rooms)
+
+    IF (@RoomCount < 1)
+      BEGIN
+        RETURN 'No rooms available'
+      END
+
+    DECLARE @Result VARCHAR(MAX) = (SELECT CONCAT('Room ', Id, ': ', Type, ' (', Beds, ' beds) - ', '$', TotalPrice)
+                                    FROM @Rooms)
+
+    RETURN @Result
+END
+
+GO
+
+CREATE OR ALTER PROC usp_SwitchRoom(@TripId INT, @TargetRoomId INT)
+AS
+BEGIN
+    DECLARE @CurrentHotelId INT = (SELECT h.Id
+                                   FROM Hotels h
+                                   JOIN Rooms r ON h.Id = r.HotelId
+                                   JOIN Trips t ON r.Id = t.RoomId
+                                  WHERE t.Id = @TripId)
+
+    DECLARE @TargetHotelId INT = (SELECT h.Id
+                                  FROM Hotels h
+                                  JOIN Rooms r ON h.Id = r.HotelId
+                                  WHERE r.Id = @TargetRoomId)
+
+    IF (@CurrentHotelId <> @TargetHotelId)
+      THROW 50013, 'Target room is in another hotel!', 1
+
+    DECLARE @PeopleCount INT = (SELECT COUNT(*)
+                                FROM AccountsTrips
+                                WHERE TripId = @TripId)
+
+    DECLARE @TargetRoomBeds INT = (SELECT Beds
+                                   FROM Rooms
+                                   WHERE Id = @TargetRoomId)
+
+    IF (@PeopleCount > @TargetRoomBeds)
+      THROW 50013, 'Not enough beds in target room!', 1
+
+    UPDATE Trips
+    SET RoomId = @TargetRoomId
+    WHERE Id = @TripId
+END
+
+GO
+
+CREATE TRIGGER T_CancelTrip
+ON Trips
+INSTEAD OF DELETE
+AS
+BEGIN
+      UPDATE Trips
+      SET CancelDate = GETDATE()
+      WHERE Id IN (SELECT Id
+                   FROM deleted
+                   WHERE CancelDate IS NULL)
+END
