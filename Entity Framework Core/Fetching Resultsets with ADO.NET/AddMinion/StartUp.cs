@@ -33,7 +33,7 @@
 
             string villainName = villains[0];
 
-            SqlConnection connection = new SqlConnection(ConnectionString);
+            connection = new SqlConnection(ConnectionString);
 
             connection.Open();
 

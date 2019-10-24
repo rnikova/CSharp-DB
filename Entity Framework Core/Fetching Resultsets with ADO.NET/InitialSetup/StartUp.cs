@@ -6,9 +6,10 @@
     {
         private static string ConnectionString = @"Server=.\SQLEXPRESS;Database={0};Integrated Security=true;";
 
+         private static SqlConnection connection = new SqlConnection(string.Format(ConnectionString, "master"));
+
         public static void Main(string[] args)
         {
-            var connection = new SqlConnection(string.Format(ConnectionString, "master"));
 
             connection.Open();
 

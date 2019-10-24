@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Data.SqlClient;
 
-    public class Program
+    public class StartUp
     {
         private static string ConnectionString = @"Server=.\SQLEXPRESS;Database=MinionsDB;Integrated Security=true;";
 
