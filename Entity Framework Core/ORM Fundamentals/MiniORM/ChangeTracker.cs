@@ -39,7 +39,7 @@
 
             var propertiesToClone = typeof(T)
                 .GetProperties()
-                .Where(x => DBContext.AllowedSqlTypes.Contains(x.PropertyType))
+                .Where(x => DbContext.AllowedSqlTypes.Contains(x.PropertyType))
                 .ToArray();
 
             foreach (var entity in entities)

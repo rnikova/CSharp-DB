@@ -8,7 +8,7 @@
     public class DbSet<TEntity> : ICollection<TEntity>
         where TEntity : class, new()
     {
-        public DbSet(IEnumerable<TEntity> entities)
+        internal DbSet(IEnumerable<TEntity> entities)
         {
             this.Entities = entities.ToList();
             this.ChangeTracker = new ChangeTracker<TEntity>(entities);

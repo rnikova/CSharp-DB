@@ -1,10 +1,10 @@
 ﻿namespace MiniORM
 {
     using System;
-    using System.Reflection;
-    using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using System.Data.SqlClient;
+    using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
 
@@ -130,7 +130,7 @@
                     .GetMethod("PopulateDbSet", BindingFlags.Instance | BindingFlags.NonPublic)
                     .MakeGenericMethod(dbSetType);
 
-                populateDbSetGeneric.Invoke(this, new[] { dbSetProperty});
+                populateDbSetGeneric.Invoke(this, new object[] { dbSetProperty});
             }
         }
 
@@ -283,7 +283,7 @@
 
         private string GetTableName(Type tableType)
         {
-            var tableName = ((TableAttribute)tableType.GetCustomAttribute<TableAttribute>())?.Name;
+            var tableName = ((TableAttribute)Attribute.GetCustomAttribute(tableType, typeof(TableAttribute)))?.Name;
 
             if (tableName == null)
             {
@@ -299,7 +299,7 @@
                 .GetType()
                 .GetProperties()
                 .Where(x => x.PropertyType.GetGenericTypeDefinition() == typeof(DbSet<>))
-                .ToDictionary(x => x.PropertyType.GetGenericArguments().First(), x => x);
+                .ToDictionary(k => k.PropertyType.GetGenericArguments().First(), v => v);
 
             return dbSets;
         }
