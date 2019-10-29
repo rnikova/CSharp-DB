@@ -17,13 +17,13 @@
         [Required]
         public string LastName { get; set; }
 
-        public bool IsEmployeed { get; set; }
+        public bool IsEmployed { get; set; }
 
         [ForeignKey(nameof(Department))]
         public int DepartmentId { get; set; }
 
         public Department Department { get; set; }
 
-        public ICollection<EmployeesProjects> EmployeeProjects { get; set; }
+        public ICollection<EmployeeProject> EmployeeProjects { get; set; }
     }
 }

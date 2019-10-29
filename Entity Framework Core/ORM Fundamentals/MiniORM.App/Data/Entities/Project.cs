@@ -11,6 +11,6 @@
         [Required]
         public string Name { get; set; }
 
-        public ICollection<EmployeesProjects> EmployeeProjects { get; set; }
+        public ICollection<EmployeeProject> EmployeeProjects { get; set; }
     }
 }

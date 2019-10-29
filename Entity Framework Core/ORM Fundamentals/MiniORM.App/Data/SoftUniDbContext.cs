@@ -15,7 +15,7 @@
 
         public DbSet<Project> Projects { get; }
 
-        public DbSet<EmployeesProjects> EmployeesProjects { get; }
+        public DbSet<EmployeeProject> EmployeesProjects { get; }
 
 
     }
