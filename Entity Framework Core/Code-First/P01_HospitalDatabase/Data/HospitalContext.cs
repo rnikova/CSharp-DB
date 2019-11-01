@@ -16,6 +16,8 @@
 
         public DbSet<Visitation> Visitations { get; set; }
 
+        public DbSet<Doctor> Doctors { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(Configuration.ConnectionString);
@@ -28,6 +30,26 @@
             ModelBuilderDiagnose(modelBuilder);
             ModelBuilderMedicament(modelBuilder);
             ModelBuilderPatientMedicament(modelBuilder);
+            ModelBuilderDoctor(modelBuilder);
+        }
+
+        private void ModelBuilderDoctor(ModelBuilder modelBuilder)
+        {
+            modelBuilder
+                .Entity<Doctor>()
+                .HasKey(k => k.DoctorId);
+
+            modelBuilder
+                .Entity<Doctor>()
+                .Property(p => p.Name)
+                .HasMaxLength(100)
+                .IsUnicode();
+
+            modelBuilder
+                .Entity<Doctor>()
+                .Property(p => p.Specialty)
+                .HasMaxLength(100)
+                .IsUnicode();
         }
 
         private void ModelBuilderPatientMedicament(ModelBuilder modelBuilder)
