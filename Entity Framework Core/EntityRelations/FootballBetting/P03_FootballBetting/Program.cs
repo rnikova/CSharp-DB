@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace P01_StudentSystem
+namespace P03_FootballBetting
 {
-    class StartUp
+    class Program
     {
         static void Main(string[] args)
         {
