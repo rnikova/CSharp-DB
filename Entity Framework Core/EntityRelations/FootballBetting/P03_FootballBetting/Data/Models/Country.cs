@@ -1,11 +1,9 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-
-namespace P03_FootballBetting.Data.Models
+﻿namespace P03_FootballBetting.Data.Models
 {
+    using System.Collections.Generic;
+
     public class Country
     {
-        [Key]
         public int CountryId { get; set; }
 
         public string Name { get; set; }

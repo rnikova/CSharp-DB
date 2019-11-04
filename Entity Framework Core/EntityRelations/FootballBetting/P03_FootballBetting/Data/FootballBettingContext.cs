@@ -45,8 +45,18 @@
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder
-                 .Entity<PlayerStatistic>()
-                 .HasKey(k => new { k.GameId, k.PlayerId });
+                 .Entity<PlayerStatistic>(entity =>
+                {
+                    entity.HasKey(k => new { k.GameId, k.PlayerId });
+
+                    entity.HasOne(e => e.Game)
+                     .WithMany(g => g.PlayerStatistics)
+                     .HasForeignKey(e => e.GameId);
+
+                    entity.HasOne(e => e.Player)
+                        .WithMany(p => p.PlayerStatistics)
+                        .HasForeignKey(e => e.PlayerId);
+                });
 
             modelBuilder
                 .Entity<Team>(entity =>
@@ -63,6 +73,11 @@
                     .HasOne(e => e.SecondaryKitColor)
                     .WithMany(pc => pc.SecondaryKitTeams)
                     .HasForeignKey(k => k.SecondaryKitColorId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                    entity.HasOne(e => e.Town)
+                    .WithMany(t => t.Teams)
+                    .HasForeignKey(e => e.TownId)
                     .OnDelete(DeleteBehavior.Restrict);
                 });
 
@@ -94,6 +109,82 @@
                     .HasForeignKey(k => k.AwayTeamId)
                     .OnDelete(DeleteBehavior.Restrict);
                 });
+
+            modelBuilder.Entity<Bet>(entity =>
+            {
+                entity.HasKey(e => e.BetId);
+
+                entity.HasOne(e => e.Game)
+                .WithMany(e => e.Bets)
+                .HasForeignKey(e => e.GameId);
+
+                entity.HasOne(e => e.User)
+                .WithMany(e => e.Bets)
+                .HasForeignKey(e => e.UserId);
+
+            });
+
+            modelBuilder.Entity<Player>(entity =>
+            {
+                entity.HasKey(e => e.PlayerId);
+
+                entity.HasOne(e => e.Position)
+                .WithMany(e => e.Players)
+                .HasForeignKey(e => e.PositionId);
+
+                entity.HasOne(e => e.Team)
+               .WithMany(e => e.Players)
+               .HasForeignKey(e => e.TeamId);
+            });
+
+            modelBuilder.Entity<Country>(entity =>
+            {
+                entity.HasKey(e => e.CountryId);
+            });
+
+            modelBuilder.Entity<Color>(entity =>
+            {
+                entity.HasKey(e => e.ColorId);
+            });
+
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.HasKey(e => e.UserId);
+            });
+
+            modelBuilder.Entity<Bet>(entity =>
+            {
+                entity.HasKey(e => e.BetId);
+
+                entity.HasOne(e => e.Game)
+                .WithMany(e => e.Bets)
+                .HasForeignKey(e => e.GameId);
+
+                entity.HasOne(e => e.User)
+                .WithMany(e => e.Bets)
+                .HasForeignKey(e => e.UserId);
+
+            });
+
+            modelBuilder.Entity<Position>(entity =>
+            {
+                entity.HasKey(e => e.PositionId);
+            });
+
+            modelBuilder.Entity<Game>(entity =>
+            {
+                entity.HasKey(e => e.GameId);
+
+                entity.HasOne(e => e.HomeTeam)
+                    .WithMany(e => e.HomeGames)
+                    .HasForeignKey(e => e.HomeTeamId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.AwayTeam)
+                   .WithMany(e => e.AwayGames)
+                   .HasForeignKey(e => e.AwayTeamId)
+                   .OnDelete(DeleteBehavior.Restrict);
+            });
         }
     }
 }
