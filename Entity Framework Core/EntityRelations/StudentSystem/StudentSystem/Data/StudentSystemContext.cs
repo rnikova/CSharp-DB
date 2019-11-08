@@ -37,6 +37,12 @@ namespace P01_StudentSystem.Data
             modelBuilder
                 .Entity<StudentCourse>()
                 .HasKey(k => new { k.CourseId, k.StudentId });
+
+            modelBuilder
+                .Entity<Homework>()
+                .HasOne<Student>(s => s.StudentId)
+                .WithMany<Homework>(h => h.StudentId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

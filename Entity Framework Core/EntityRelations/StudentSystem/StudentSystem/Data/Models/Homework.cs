@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
 
 namespace P01_StudentSystem.Data.Models
 {
@@ -22,7 +20,7 @@ namespace P01_StudentSystem.Data.Models
         public DateTime SubmissionTime { get; set; }
 
         [Required]
-        [ForeignKey("Student")]
+        //[ForeignKey("Student")]
         public int StudentId { get; set; }
 
         public Student Student { get; set; }
