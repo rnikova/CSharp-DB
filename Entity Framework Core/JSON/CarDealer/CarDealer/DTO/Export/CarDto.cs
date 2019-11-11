@@ -4,8 +4,8 @@
 
     public class CarDto
     {
-        [JsonProperty("Id")]
-        public int Id { get; set; }
+        //[JsonProperty("Id")]
+        //public int Id { get; set; }
 
         [JsonProperty("Make")]
         public string Make { get; set; }

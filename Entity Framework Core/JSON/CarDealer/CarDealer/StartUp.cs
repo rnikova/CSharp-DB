@@ -24,7 +24,76 @@ namespace CarDealer
 
             var inputJson = File.ReadAllText(@"D:\SoftUni\CSharp-DB\Entity Framework Core\JSON\CarDealer\CarDealer\Datasets\sales.json");
 
-            Console.WriteLine(GetCarsFromMakeToyota(context));
+            Console.WriteLine(GetSalesWithAppliedDiscount(context));
+        }
+
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            var sales = context.Sales
+                .Select(s => new
+                {
+                    car = new CarDto
+                    {
+                        Make = s.Car.Make,
+                        Model = s.Car.Model,
+                        TravelledDistance = s.Car.TravelledDistance
+                    },
+                    customerName = s.Customer.Name,
+                    Discount = $"{s.Discount:F2}",
+                    price = $"{s.Car.PartCars.Sum(p => p.Part.Price):F2}",
+                    priceWithDiscount = $@"{(s.Car.PartCars.Sum(p => p.Part.Price) -
+                            s.Car.PartCars.Sum(p => p.Part.Price) * s.Discount / 100):F2}"
+                })
+                .Take(10)
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(sales, Formatting.Indented);
+
+            return json;
+        }
+
+        public static string GetTotalSalesByCustomer(CarDealerContext context)
+        {
+            var customers = context.Customers
+                .Where(c => c.Sales.Count() >= 1)
+                .Select(c => new CustomerCarDto
+                {
+                    FullName = c.Name,
+                    BoughtCars = c.Sales.Count(),
+                    SpentMoney = c.Sales.Sum(s => s.Car.PartCars.Sum(p => p.Part.Price))
+                })
+                .OrderByDescending(m => m.SpentMoney)
+                .ThenByDescending(c => c.BoughtCars)
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(customers, Formatting.Indented);
+
+            return json;
+        }
+
+        public static string GetCarsWithTheirListOfParts(CarDealerContext context)
+        {
+            var cars = context.Cars
+                .Select(c => new
+                {
+                    car = new CarDto
+                    {
+                        Make = c.Make,
+                        Model = c.Model,
+                        TravelledDistance = c.TravelledDistance
+                    },
+                    parts = c.PartCars.Select(p => new PartDto
+                    {
+                        Name = p.Part.Name,
+                        Price = $"{p.Part.Price:F2}"
+                    })
+                    .ToList()
+                })
+                .ToList();
+
+            var json = JsonConvert.SerializeObject(cars, Formatting.Indented);
+
+            return json;
         }
 
         public static string GetLocalSuppliers(CarDealerContext context)
@@ -50,7 +119,7 @@ namespace CarDealer
                 .Where(c => c.Make == "Toyota")
                 .Select(c => new CarDto
                 {
-                    Id = c.Id,
+                    //Id = c.Id,
                     Make = c.Make,
                     Model = c.Model,
                     TravelledDistance = c.TravelledDistance
