@@ -2,7 +2,7 @@
 {
     using System.Xml.Serialization;
 
-    [XmlType("SoldProduct")]
+    [XmlType("Product")]
     public class ExportSoldProductDto
     {
         [XmlElement("name")]

@@ -37,39 +37,41 @@
         public static string GetUsersWithProducts(ProductShopContext context)
         {
             var users = context.Users
-                .Where(u => u.ProductsSold.Any())
-                .OrderByDescending(p => p.ProductsSold.Count())
-                .Select(u => new UsersWithSoldProductsDto
-                {
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                    Age = u.Age,
-                    SoldProducts = new SoldProductsCountDto
-                    {
-                        Count = u.ProductsSold.Count(),
-                        Products = u.ProductsSold
-                        .Select(p => new SoldProductsDto
-                        {
-                            Name = p.Name,
-                            Price = p.Price
-                        })
-                        .OrderByDescending(p => p.Price)
-                        .ToArray()
-                    }
-                })
-                .Take(10)
-                .ToArray();
+               .Where(u => u.ProductsSold.Any())
+               .OrderByDescending(p => p.ProductsSold.Count())
+               .Select(u => new ExportUsersWithSoldProductsDto
+               {
+                   FirstName = u.FirstName,
+                   LastName = u.LastName,
+                   Age = u.Age,
+                   SoldProducts = new ExportSoldProductsCountDto
+                   {
+                       Count = u.ProductsSold.Count(),
+                       Products = u.ProductsSold
+                       .Select(p => new ExportSoldProductDto
+                       {
+                           Name = p.Name,
+                           Price = p.Price
+                       })
+                       .OrderByDescending(p => p.Price)
+                       .ToArray()
+                   }
+               })
+               .Take(10)
+               .ToArray();
 
-            var result = new UsersAndProductsDto
+            var result = new ExportUsersAndProductsDto
             {
                 Count = context.Users.Count(p => p.ProductsSold.Any()),
                 Users = users
             };
 
-            var xmlSerializer = new XmlSerializer(typeof(UsersAndProductsDto), new XmlRootAttribute("Users"));
+            var xmlSerializer = new XmlSerializer(typeof(ExportUsersAndProductsDto), new XmlRootAttribute("Users"));
 
             var sb = new StringBuilder();
+
             var namespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+
             xmlSerializer.Serialize(new StringWriter(sb), result, namespaces);
 
             return sb.ToString().TrimEnd();
@@ -102,30 +104,30 @@
 
         public static string GetSoldProducts(ProductShopContext context)
         {
-            var users = context.Users
-                .Where(x => x.ProductsSold.Any(y => y.Buyer != null))
-                .Select(x => new ExportUserWithSoldProductsDto
-                {
-                    FirstName = x.FirstName,
-                    LastName = x.LastName,
-                    Products = x.ProductsSold.Select(p => new ExportSoldProductDto
-                    {
-                        Name = p.Name,
-                        Price = p.Price
-                    })
-                    .ToArray()
-                })
-                .OrderBy(x => x.LastName)
-                .ThenBy(x => x.FirstName)
-                .Take(5)
-                .ToArray();
+            //var users = context.Users
+            //    .Where(x => x.ProductsSold.Any(y => y.Buyer != null))
+            //    .Select(x => new ExportUserWithSoldProductsDto
+            //    {
+            //        FirstName = x.FirstName,
+            //        LastName = x.LastName,
+            //        Products = x.ProductsSold.Select(p => new ExportSoldProductDto
+            //        {
+            //            Name = p.Name,
+            //            Price = p.Price
+            //        })
+            //        .ToArray()
+            //    })
+            //    .OrderBy(x => x.LastName)
+            //    .ThenBy(x => x.FirstName)
+            //    .Take(5)
+            //    .ToArray();
 
-            var xmlSerializer = new XmlSerializer(typeof(ExportUserWithSoldProductsDto[]), new XmlRootAttribute("Users"));
+            //var xmlSerializer = new XmlSerializer(typeof(ExportUserWithSoldProductsDto[]), new XmlRootAttribute("Users"));
 
             var sb = new StringBuilder();
 
-            var namespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
-            xmlSerializer.Serialize(new StringWriter(sb), users, namespaces);
+            //var namespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+            //xmlSerializer.Serialize(new StringWriter(sb), users, namespaces);
 
             return sb.ToString().TrimEnd();
         }

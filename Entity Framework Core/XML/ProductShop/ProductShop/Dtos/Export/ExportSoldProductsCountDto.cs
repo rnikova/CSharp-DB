@@ -5,10 +5,10 @@
     [XmlType("SoldProducts")]
     public class ExportSoldProductsCountDto
     {
-        [XmlElement(ElementName = "count")]
+        [XmlElement("count")]
         public int Count { get; set; }
 
-        [XmlArray(ElementName = "products")]
+        [XmlArray("products")]
         public ExportSoldProductDto[] Products { get; set; }
     }
 }
