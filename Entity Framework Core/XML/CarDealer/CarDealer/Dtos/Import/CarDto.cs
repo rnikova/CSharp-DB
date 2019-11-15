@@ -12,7 +12,7 @@
         public string Model { get; set; }
 
         [XmlElement("TraveledDistance")]
-        public int TraveledDistance { get; set; }
+        public long TraveledDistance { get; set; }
 
         [XmlElement("parts")]
         public CarPartDto Parts { get; set; }

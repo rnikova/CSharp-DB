@@ -24,7 +24,7 @@ namespace CarDealer
 
             var inputJson = File.ReadAllText(@"D:\SoftUni\CSharp-DB\Entity Framework Core\JSON\CarDealer\CarDealer\Datasets\sales.json");
 
-            Console.WriteLine(GetSalesWithAppliedDiscount(context));
+            Console.WriteLine(GetCarsFromMakeToyota(context));
         }
 
         public static string GetSalesWithAppliedDiscount(CarDealerContext context)
