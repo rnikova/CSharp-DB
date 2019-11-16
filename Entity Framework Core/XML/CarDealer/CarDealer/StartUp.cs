@@ -1,17 +1,19 @@
 ﻿namespace CarDealer
 {
-    using AutoMapper;
-    using CarDealer.Data;
-    using CarDealer.Dtos.Export;
-    using CarDealer.Dtos.Import;
-    using CarDealer.Models;
     using System;
-    using System.Collections.Generic;
     using System.IO;
+    using System.Xml;
     using System.Linq;
     using System.Text;
-    using System.Xml;
     using System.Xml.Serialization;
+    using System.Collections.Generic;
+
+    using AutoMapper;
+
+    using CarDealer.Data;
+    using CarDealer.Models;
+    using CarDealer.Dtos.Import;
+    using CarDealer.Dtos.Export;
 
     public class StartUp
     {
@@ -29,7 +31,37 @@
 
             var inputXml = File.ReadAllText(@"..\..\..\Datasets\sales.xml");
 
-            Console.WriteLine(GetLocalSuppliers(context));
+            Console.WriteLine(GetSalesWithAppliedDiscount(context));
+        }
+
+        public static string GetSalesWithAppliedDiscount(CarDealerContext context)
+        {
+            var sales = context.Sales
+                .Select(x => new SalesWithDiscountDto
+                {
+                    Car = new CarsWithDistanceDto
+                    {
+                        Make = x.Car.Make,
+                        Model = x.Car.Model,
+                        TravelledDistance = x.Car.TravelledDistance
+                    },
+                    Discount = x.Discount,
+                    CustomerName = x.Customer.Name,
+                    Price = x.Car.PartCars.Sum(p => p.Part.Price),
+                    PriceWithDiscount = x.Car.PartCars.Sum(p => p.Part.Price) -
+                        x.Car.PartCars.Sum(p => p.Part.Price) * x.Discount / 100
+                })
+                .ToArray();
+
+            var xmlSerializer = new XmlSerializer(typeof(SalesWithDiscountDto[]), new XmlRootAttribute("sales"));
+
+            var sb = new StringBuilder();
+
+            var namespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
+
+            xmlSerializer.Serialize(new StringWriter(sb), sales, namespaces);
+
+            return sb.ToString().TrimEnd();
         }
 
         public static string GetTotalSalesByCustomer(CarDealerContext context)
