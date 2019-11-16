@@ -11,11 +11,11 @@ namespace VaporStore.DataProcessor.ImportDtos
         public string Name { get; set; }
 
         [Required]
-        [Range(typeof(decimal), "0.00", "79228162514264337593543950335M")]
+        [Range(0.0, double.MaxValue)]
         public decimal Price { get; set; }
 
         [Required]
-        public DateTime ReleaseDate { get; set; }
+        public string ReleaseDate { get; set; }
 
         [Required]
         public string Developer { get; set; }
