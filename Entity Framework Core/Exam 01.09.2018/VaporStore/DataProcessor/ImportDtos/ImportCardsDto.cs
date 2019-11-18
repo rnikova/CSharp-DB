@@ -5,7 +5,7 @@ using System.Text;
 
 namespace VaporStore.DataProcessor.ImportDtos
 {
-    public class CardsDto
+    public class ImportCardsDto
     {
         [Required]
         [RegularExpression(@"^[\d]{4}\s+[\d]{4}\s+[\d]{4}\s+[\d]{4}$")]

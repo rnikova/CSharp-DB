@@ -23,6 +23,6 @@ namespace VaporStore.DataProcessor.ImportDtos
         public int Age { get; set; }
 
         [Required]
-        public CardsDto[] Cards { get; set; }
+        public ImportCardsDto[] Cards { get; set; }
     }
 }

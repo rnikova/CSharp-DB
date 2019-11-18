@@ -11,9 +11,12 @@
     using VaporStore.Data.Models;
     using System.Globalization;
     using VaporStore.Data.Enums;
+    using System.Xml.Serialization;
+    using System.IO;
 
     public static class Deserializer
     {
+
         public static string ImportGames(VaporStoreDbContext context, string jsonString)
         {
             var gamesDto = JsonConvert.DeserializeObject<ImportGameDto[]>(jsonString);
@@ -107,7 +110,48 @@
 
         public static string ImportPurchases(VaporStoreDbContext context, string xmlString)
         {
-            throw new NotImplementedException();
+            var xmlSerializer = new XmlSerializer(typeof(ImportPurchaseDto[]), new XmlRootAttribute("Purchases"));
+            var purchasesDto = (ImportPurchaseDto[])xmlSerializer.Deserialize(new StringReader(xmlString));
+
+            var sb = new StringBuilder();
+            var purchases = new List<Purchase>();
+
+            foreach (var purchaseDto in purchasesDto)
+            {
+                if (!IsValid(purchaseDto))
+                {
+                    sb.AppendLine("Invalid Data");
+                    continue;
+                }
+
+                var game = context.Games.FirstOrDefault(x => x.Name == purchaseDto.Title);
+                var card = context.Cards.FirstOrDefault(x => x.Number == purchaseDto.Card);
+                var date = DateTime.ParseExact(purchaseDto.Date, "dd/MM/yyyy HH:mm", CultureInfo.InvariantCulture);
+                //var isValidType = Enum.TryParse<PurchaseType>(purchaseDto.Type, out PurchaseType purchaseType);
+
+                if (game == null || card == null)
+                {
+                    sb.AppendLine("Invalid Data");
+                    continue;
+                }
+                
+                var purchase = new Purchase()
+                {
+                    Game = game, 
+                    Type = purchaseDto.Type, 
+                    Card = card, 
+                    ProductKey = purchaseDto.Key, 
+                    Date = date
+                };
+
+                purchases.Add(purchase);
+                sb.AppendLine($"Imported {game.Name} for {purchase.Card.User.Username}");
+            }
+
+            context.Purchases.AddRange(purchases);
+            context.SaveChanges();
+
+            return sb.ToString().TrimEnd();
         }
 
         private static bool IsValid(object entity)
