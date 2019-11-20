@@ -84,7 +84,7 @@
                 {
                     Name = x.Name,
                     Count = x.CategoryProducts.Count(),
-                    AveragePrice = x.CategoryProducts.Sum(p => p.Product.Price) / x.CategoryProducts.Count(),
+                    AveragePrice = x.CategoryProducts.Average(p => p.Product.Price),
                     TotalRevenue = x.CategoryProducts.Sum(p => p.Product.Price)
                 })
                 .OrderByDescending(x => x.Count)

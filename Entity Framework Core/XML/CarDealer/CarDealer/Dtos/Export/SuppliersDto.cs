@@ -2,7 +2,7 @@
 {
     using System.Xml.Serialization;
 
-    [XmlType("supplier")]
+    [XmlType("suplier")]
     public class SuppliersDto
     {
         [XmlAttribute("id")]

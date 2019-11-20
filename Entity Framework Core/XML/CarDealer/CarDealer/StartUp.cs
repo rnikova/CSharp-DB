@@ -67,11 +67,11 @@
         public static string GetTotalSalesByCustomer(CarDealerContext context)
         {
             var customers = context.Customers
-                .Where(x => x.Sales.Any())
+                .Where(x => x.Sales.Count() >= 1)
                 .Select(c => new SalesByCustomerDto
                 {
                     FullName = c.Name,
-                    BoughtCars = c.Sales.Sum(s => s.CarId),
+                    BoughtCars = c.Sales.Count(),
                     SpentMoney = c.Sales.SelectMany(s => s.Car.PartCars).Sum(cp => cp.Part.Price)
                 })
                 .OrderByDescending(c => c.SpentMoney)
@@ -104,17 +104,15 @@
                     .OrderByDescending(p => p.Price)
                     .ToArray()
                 })
-                .OrderByDescending(x => x.TravelledDistance)
-                .ThenBy(x => x.Model)
+                .OrderByDescending(c => c.TravelledDistance)
+                .ThenBy(c => c.Model)
                 .Take(5)
                 .ToArray();
 
             var xmlSerializer = new XmlSerializer(typeof(CarsWithListOfPartsDto[]), new XmlRootAttribute("cars"));
 
             var sb = new StringBuilder();
-
             var namespaces = new XmlSerializerNamespaces(new[] { XmlQualifiedName.Empty });
-
             xmlSerializer.Serialize(new StringWriter(sb), cars, namespaces);
 
             return sb.ToString().TrimEnd();

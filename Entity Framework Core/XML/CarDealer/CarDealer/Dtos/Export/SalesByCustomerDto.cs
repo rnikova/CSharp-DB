@@ -2,7 +2,7 @@
 {
     using System.Xml.Serialization;
 
-    [XmlType("customers")]
+    [XmlType("customer")]
     public class SalesByCustomerDto
     {
         [XmlAttribute("full-name")]
