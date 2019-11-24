@@ -1,7 +1,10 @@
 ﻿namespace Cinema.DataProcessor
 {
     using System;
+    using System.IO;
+    using System.Linq;
     using System.Text;
+    using System.Globalization;
     using System.Xml.Serialization;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -12,9 +15,6 @@
     using Cinema.Data.Models;
     using Cinema.Data.Models.Enums;
     using Cinema.DataProcessor.ImportDto;
-    using System.IO;
-    using System.Globalization;
-    using System.Linq;
 
     public class Deserializer
     {
@@ -91,23 +91,23 @@
                 for (int i = 0; i < hallDto.Seats; i++)
                 {
                     hall.Seats.Add(new Seat());
+                }
 
-                    if (hall.Is3D)
-                    {
-                        projectionType = "3D";
-                    }
-                    else if (hall.Is4Dx)
-                    {
-                        projectionType = "4Dx";
-                    }
-                    else if (hall.Is3D && hall.Is4Dx)
-                    {
-                        projectionType = "4Dx/3D";
-                    }
-                    else
-                    {
-                        projectionType = "Normal";
-                    }
+                if (hall.Is3D && hall.Is4Dx)
+                {
+                    projectionType = "4Dx/3D";
+                }
+                else if (hall.Is3D)
+                {
+                    projectionType = "3D";
+                }
+                else if (hall.Is4Dx)
+                {
+                    projectionType = "4Dx";
+                }
+                else
+                {
+                    projectionType = "Normal";
                 }
 
                 halls.Add(hall);
@@ -147,6 +147,7 @@
                 };
 
                 projections.Add(projection);
+
                 sb.AppendLine(string.Format(SuccessfulImportProjection, movie.Title, projection.DateTime.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture)));
             }
 
@@ -192,7 +193,7 @@
                     });
                 }
 
-                sb.AppendLine(string.Format(SuccessfulImportCustomerTicket, customer.FirstName, customer.LastName, customer.Tickets.Count));
+                sb.AppendLine(string.Format(SuccessfulImportCustomerTicket, customer.FirstName, customer.LastName, customer.Tickets.Count()));
 
                 customers.Add(customer);
             }

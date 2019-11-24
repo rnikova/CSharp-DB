@@ -6,13 +6,10 @@
     [XmlType("Projection")]
     public class ProjectionDto
     {
-        [Required]
         public int MovieId { get; set; }
 
-        [Required]
         public int HallId { get; set; }
 
-        [Required]
         public string DateTime { get; set; }
     }
 }
