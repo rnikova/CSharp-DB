@@ -36,7 +36,7 @@
                 sb.AppendLine($"Imported {departmentDto.Name} with {departmentDto.Cells.Count} cells");
             }
 
-            context.AddRange(departments);
+            context.Departments.AddRange(departments);
             context.SaveChanges();
 
             return sb.ToString().TrimEnd();
@@ -81,7 +81,7 @@
                 sb.AppendLine($"Imported {prisoner.FullName} {prisoner.Age} years old");
             }
 
-            context.AddRange(prisoners);
+            context.Prisoners.AddRange(prisoners);
             context.SaveChanges();
 
             return sb.ToString().TrimEnd();
@@ -123,7 +123,7 @@
                 officers.Add(officer);
             }
 
-            context.AddRange(officers);
+            context.Officers.AddRange(officers);
             context.SaveChanges();
 
             return sb.ToString().TrimEnd();
