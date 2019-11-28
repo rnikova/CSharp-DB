@@ -11,7 +11,7 @@ namespace PetStore.Data
 
         public DbSet<Category> Categories { get; set; }
 
-        public DbSet<Food> Foods { get; set; }
+        public DbSet<Food> Food { get; set; }
 
         public DbSet<Order> Orders { get; set; }
 

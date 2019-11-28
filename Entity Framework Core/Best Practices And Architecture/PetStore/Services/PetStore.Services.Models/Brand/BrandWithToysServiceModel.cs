@@ -1,10 +1,12 @@
-﻿using System;
+﻿using PetStore.Services.Models.Toy;
 using System.Collections.Generic;
-using System.Text;
 
 namespace PetStore.Services.Models.Brand
 {
-    class Class1
+    public class BrandWithToysServiceModel
     {
+        public string Name { get; set; }
+
+        public IEnumerable<ToyListingServiceModel> Toys { get; set; }
     }
 }

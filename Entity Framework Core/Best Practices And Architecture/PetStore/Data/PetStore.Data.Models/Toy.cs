@@ -17,6 +17,8 @@ namespace PetStore.Data.Models
 
         public decimal Price { get; set; }
 
+        public decimal DistributorPrice { get; set; }
+
         public int BrandId { get; set; }
 
         public Brand Brand { get; set; }

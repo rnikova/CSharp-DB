@@ -1,9 +1,14 @@
-﻿namespace PetStore.Services
+﻿using PetStore.Services.Models.Brand;
+using System.Collections.Generic;
+
+namespace PetStore.Services
 {
     public interface IBrandService
     {
-        void Create();
+        int Create(string name);
 
-        IEnumerable<> SearchByName(string name);
+        IEnumerable<BrandListingServiceModel> SearchByName(string name);
+
+        BrandWithToysServiceModel FindByIdWithToys(int id);
     }
 }
