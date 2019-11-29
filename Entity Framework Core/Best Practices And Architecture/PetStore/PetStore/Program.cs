@@ -12,9 +12,10 @@ namespace PetStore
 
             var brandService = new BrandService(data);
 
-            var foodService = new FoodService(data);
+            var userService = new UserService(data);
+            var foodService = new FoodService(data, userService);
 
-            var toyservice = new ToyService(data);
+            var toyService = new ToyService(data, userService);
         }
     }
 }

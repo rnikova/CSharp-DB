@@ -7,5 +7,9 @@ namespace PetStore.Services
         void ByToyByDistributor(string name, string description, decimal distributorPrice, decimal profit, int brandId, int categoryId);
 
         void ByToyByDistributor(AddingToyServiceModel model);
+
+        void SellToUser(int toyId, int userId);
+
+        bool IsExist(int toyId);
     }
 }

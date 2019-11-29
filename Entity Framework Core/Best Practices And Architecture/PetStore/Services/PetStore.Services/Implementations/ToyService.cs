@@ -2,6 +2,7 @@
 using PetStore.Data.Models;
 using PetStore.Services.Models.Toy;
 using System;
+using System.Linq;
 
 namespace PetStore.Services.Implementations
 {
@@ -9,8 +10,13 @@ namespace PetStore.Services.Implementations
     {
 
         private readonly PetStoreDbContext data;
+        private readonly UserService userService;
 
-        public ToyService(PetStoreDbContext data) => this.data = data;
+        public ToyService(PetStoreDbContext data, UserService userService) 
+        { 
+            this.data = data;
+            this.userService = userService;
+        }
 
         public void ByToyByDistributor(string name, string description, decimal distributorPrice, decimal profit, int brandId, int categoryId)
         {
@@ -60,6 +66,41 @@ namespace PetStore.Services.Implementations
                 CategoryId = model.CategoryId
             };
 
+        }
+
+        public bool IsExist(int toyId)
+        {
+            return this.data.Toys.Any(t => t.Id == toyId);
+        }
+
+        public void SellToUser(int toyId, int userId)
+        {
+            if (!this.IsExist(toyId))
+            {
+                throw new ArgumentException("There is no such toy with given Id in the database!");
+            }
+
+            if (!this.userService.IsExist(userId))
+            {
+                throw new ArgumentException("There is no such user with given Id in the database!");
+            }
+
+            var order = new Order()
+            {
+                PurchaseDate = DateTime.Now,
+                Status = OrderStatus.Done,
+                UserId = userId
+            };
+
+            var toyOrder = new ToyOrder()
+            {
+                ToyId = toyId,
+                Order = order
+            };
+
+            this.data.Orders.Add(order);
+            this.data.ToyOrders.Add(toyOrder);
+            this.data.SaveChanges();
         }
     }
 }
