@@ -2,6 +2,6 @@
 {
     public static class DataSetings
     {
-        public const string ConnectionString = @"Server=.\SQLEXPRESS;Database=WRITEME;Integrated Security=true;";
+        public const string ConnectionString = @"Server=.\SQLEXPRESS;Database=PetStoreCatalog;Integrated Security=true;";
     }
 }

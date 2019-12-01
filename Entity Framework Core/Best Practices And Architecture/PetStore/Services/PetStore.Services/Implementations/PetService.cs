@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using PetStore.Data;
 using PetStore.Data.Models;
+using PetStore.Services.Models.Pet;
 
 namespace PetStore.Services.Implementations
 {
@@ -36,8 +38,8 @@ namespace PetStore.Services.Implementations
                 throw new ArgumentException("There is no such category with given Id in the database!");
             }
 
-            var pet = new Pet() 
-            { 
+            var pet = new Pet()
+            {
                 Gender = gender,
                 DateOfBirth = dateOfBirth,
                 Price = price,
@@ -81,5 +83,16 @@ namespace PetStore.Services.Implementations
         {
             return this.data.Pets.Any(p => p.Id == petId);
         }
+
+        public IEnumerable<PetListingServiceModel> All()
+        => this.data.Pets
+            .Select(p => new PetListingServiceModel
+            {
+                Id = p.Id,
+                Category = p.Category.Name,
+                Price = p.Price,
+                Breed = p.Breed.Name
+            })
+            .ToList();
     }
 }

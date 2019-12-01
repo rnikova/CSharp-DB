@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
@@ -13,7 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Data\PetStore.Data.Models\PetStore.Data.Models.csproj" />
     <ProjectReference Include="..\Data\PetStore.Data\PetStore.Data.csproj" />
+    <ProjectReference Include="..\Services\PetStore.Services.Models\PetStore.Services.Models.csproj" />
     <ProjectReference Include="..\Services\PetStore.Services\PetStore.Services.csproj" />
   </ItemGroup>
 

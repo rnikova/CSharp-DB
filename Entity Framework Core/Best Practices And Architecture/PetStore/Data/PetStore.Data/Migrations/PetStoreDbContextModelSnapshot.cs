@@ -87,6 +87,9 @@ namespace PetStore.Data.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<decimal>("DistributorPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<DateTime>("ExpirationDate")
                         .HasColumnType("datetime2");
 
@@ -107,7 +110,7 @@ namespace PetStore.Data.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("Foods");
+                    b.ToTable("Food");
                 });
 
             modelBuilder.Entity("PetStore.Data.Models.FoodOrder", b =>
@@ -122,7 +125,7 @@ namespace PetStore.Data.Migrations
 
                     b.HasIndex("FoodId");
 
-                    b.ToTable("FoodOrder");
+                    b.ToTable("FoodOrders");
                 });
 
             modelBuilder.Entity("PetStore.Data.Models.Order", b =>
@@ -205,6 +208,9 @@ namespace PetStore.Data.Migrations
                         .HasColumnType("nvarchar(1000)")
                         .HasMaxLength(1000);
 
+                    b.Property<decimal>("DistributorPrice")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(40)")
@@ -234,7 +240,7 @@ namespace PetStore.Data.Migrations
 
                     b.HasIndex("ToyId");
 
-                    b.ToTable("ToyOrder");
+                    b.ToTable("ToyOrders");
                 });
 
             modelBuilder.Entity("PetStore.Data.Models.User", b =>
