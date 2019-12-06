@@ -4,12 +4,15 @@
     using Data;
     using Newtonsoft.Json;
     using SoftJail.Data.Models;
+    using SoftJail.Data.Models.Enums;
     using SoftJail.DataProcessor.ImportDto;
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
+    using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Xml.Serialization;
 
     public class Deserializer
     {
@@ -75,7 +78,41 @@
 
         public static string ImportOfficersPrisoners(SoftJailDbContext context, string xmlString)
         {
-            throw new NotImplementedException();
+            var serializer = new XmlSerializer(typeof(OfficerDto[]), new XmlRootAttribute("Officers"));
+            var officersDto = (OfficerDto[])serializer.Deserialize(new StringReader(xmlString));
+
+            var officers = new List<Officer>();
+            var sb = new StringBuilder();
+
+            foreach (var officerDto in officersDto)
+            {
+                bool isValidWeapon = Enum.IsDefined(typeof(Weapon), officerDto.Weapon);
+                bool isValidPosition = Enum.IsDefined(typeof(Position), officerDto.Position);
+
+                if (!isValidPosition || !isValidWeapon)
+                {
+                    sb.AppendLine("Invalid Data");
+                    continue;
+                }
+
+                var officer = Mapper.Map<Officer>(officerDto);
+
+                if (!IsValid(officer))
+                {
+                    sb.AppendLine("Invalid Data");
+                    continue;
+                }
+
+                officer.OfficerPrisoners = officerDto.Prisoners.Select(x => new OfficerPrisoner { PrisonerId = x.Id }).ToArray();
+
+                officers.Add(officer);
+                sb.AppendLine($"Imported {officer.FullName} ({officer.OfficerPrisoners.Count} prisoners)");
+            }
+
+            context.Officers.AddRange(officers);
+            context.SaveChanges();
+
+            return sb.ToString().TrimEnd();
         }
 
         private static bool IsValid(object entity)

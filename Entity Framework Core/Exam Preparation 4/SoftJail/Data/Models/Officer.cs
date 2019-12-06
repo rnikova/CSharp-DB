@@ -26,7 +26,6 @@ namespace SoftJail.Data.Models
 
         public int DepartmentId { get; set; }
 
-        [Required]
         public Department Department { get; set; }
 
         public ICollection<OfficerPrisoner> OfficerPrisoners { get; set; }
