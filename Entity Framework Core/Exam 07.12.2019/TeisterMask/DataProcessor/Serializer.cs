@@ -66,6 +66,7 @@
                         })
                         .ToList()
                 })
+                .ToList()
                 .OrderByDescending(x => x.Tasks.Count)
                 .ThenBy(x => x.Username)
                 .Take(10)
