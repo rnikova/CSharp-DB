@@ -7,8 +7,12 @@ namespace PetStore.Services
     {
         void Create(CreateCategoryServiceModel model);
 
+        void Edit(EditCategoryServiceModel model);
+
         bool IsExist(int categoryId);
 
         IEnumerable<AllCategoriesServiceModel> All();
+
+        DetailsCategoryServiceModel GetById(int id);
     }
 }

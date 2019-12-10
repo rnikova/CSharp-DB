@@ -43,5 +43,29 @@ namespace PetStore.Services.Implementations
         {
             return this.data.Categories.Any(c => c.Id == categoryId);
         }
+
+        public DetailsCategoryServiceModel GetById(int id)
+        {
+            var category = this.data.Categories.Find(id);
+
+            var detailServiceModel = new DetailsCategoryServiceModel
+            {
+                Id = category?.Id,
+                Name = category?.Name,
+                Description = category?.Description
+            };
+
+            return detailServiceModel;
+        }
+
+        public void Edit(EditCategoryServiceModel model)
+        {
+            var category = this.data.Categories.Find(model.Id);
+
+            category.Name = model.Name;
+            category.Description = model.Decription;
+
+            this.data.SaveChanges();
+        }
     }
 }

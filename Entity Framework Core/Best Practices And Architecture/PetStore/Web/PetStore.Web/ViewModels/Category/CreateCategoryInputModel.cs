@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using static PetStore.Data.Models.DataValidation;
 
-namespace PetStore.Web.ViewModels
+namespace PetStore.Web.ViewModels.Category
 {
     public class CreateCategoryInputModel
     {
