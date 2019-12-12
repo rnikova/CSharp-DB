@@ -113,6 +113,39 @@ namespace PetStore.Web.Controllers
             return RedirectToAction("All", "Categories");
         }
 
+        [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            var category = this.categoryService.GetById(id);
+
+            if (category.Name == null)
+            {
+               return this.BadRequest();
+            }
+
+            var categoryServiceModel = new CategoryDetailsViewModel
+            {
+                Id = category.Id,
+                Name = category.Name,
+                Decription = category.Description
+            };
+
+            return this.View(categoryServiceModel);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(CategoryDetailsViewModel model)
+        {
+            bool success = this.categoryService.Remove((int)model.Id);
+
+            if (!success)
+            {
+                return RedirectToAction("Errorr", "Home");
+            }
+
+            return RedirectToAction("All", "Categories");
+        }
+
         public IActionResult All()
         {
             var categories = categoryService.All()

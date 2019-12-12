@@ -67,5 +67,21 @@ namespace PetStore.Services.Implementations
 
             this.data.SaveChanges();
         }
+
+        public bool Remove(int id)
+        {
+            var category = this.data.Categories
+                .Find(id);
+
+            if (category == null)
+            {
+                return false;
+            }
+
+            this.data.Categories.Remove(category);
+            this.data.SaveChanges();
+
+            return true;
+        }
     }
 }

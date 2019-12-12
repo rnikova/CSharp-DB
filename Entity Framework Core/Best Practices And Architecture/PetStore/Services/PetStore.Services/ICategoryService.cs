@@ -9,6 +9,8 @@ namespace PetStore.Services
 
         void Edit(EditCategoryServiceModel model);
 
+        bool Remove(int id);
+
         bool IsExist(int categoryId);
 
         IEnumerable<AllCategoriesServiceModel> All();
